@@ -3,6 +3,8 @@ jQuery plugin for populating chained selects using hierarchical javascript (JSON
 
 ## Sample usage
 
+[Demo can be seen here](https://smarek.github.io/jquery-chained-selects/demo.html)
+
 ```html
 <form>
   <select id="sample-select"></select>

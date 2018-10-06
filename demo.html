@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>jQuery Chained Selects Demo</title>
+</head>
+<body>
+<div class="container">
+    <form method="post" action="https://httpbin.org/post">
+        <select name="example_select" id="example-select"></select>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://smarek.github.io/jquery-chained-selects/jquery.chained.selects.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var chainedData = {
+            "A": {
+                "AA": {
+                    1: "AAA"
+                },
+                "AB": {
+                    2: "ABA"
+                }
+            },
+            "B": {
+                "BA": {
+                    "BAA": {
+                        3: "BAAA"
+                    }
+                }
+            },
+            "C": {
+                "CA": {
+                    4: "CAA"
+                },
+                "CB": {
+                    5: "CBA"
+                },
+                "CC": {
+                    "CCA": {
+                        6: "CCAA",
+                        7: "CCAB"
+                    }
+                }
+            }
+        };
+        $('#example-select').chainedSelects({
+            data: chainedData,
+            loggingEnabled: true
+        });
+    });
+</script>
+</body>
+</html>

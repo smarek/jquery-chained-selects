@@ -27,6 +27,7 @@
             var currentLevel = levelSelect.data(attr_level_id);
             log("levelChangedCallback sid:" + currentSID + ", level-id:" + currentLevel + ", currentVal: " + currentSelectedValue);
             var baseLevel = getLevel(currentSID, 0);
+            hideLevelsGreaterThan(currentSID, currentLevel);
             if (!currentSelectedValue) {
                 baseLevel.data(attr_selected_option, "");
             } else if ($.isNumeric(currentSelectedValue)) {

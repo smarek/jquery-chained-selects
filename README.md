@@ -16,7 +16,7 @@ var chainedData = {
         1: "AA",
         2: "AB"
     },
-    B: {
+    "B": {
         "BB": {
             3: "BBB"
         }

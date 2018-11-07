@@ -5,7 +5,8 @@
             attr_selected_option = 'selected-option',
             attr_value_select_class = 'chained-select';
         // callable variables
-        var log, getLevel, hideLevelsGreaterThan, levelChangedCallback, randomString, generateSID, fillLevelData;
+        var log, getLevel, hideLevelsGreaterThan, levelChangedCallback, randomString, generateSID, fillLevelData,
+            findPathForKey, openDefaultPath;
         // data variables
         var levels = [];
         randomString = function (length, chars) {
@@ -69,11 +70,11 @@
                 if (!data.hasOwnProperty(key)) {
                     log("ignoring key:" + key + ", on levelNum:" + levelNum + " chain-id:" + sid);
                 } else if (data.hasOwnProperty(key) && $.isNumeric(key)) {
-                    $opt = $(new Option(data[key], ""));
+                    $opt = $(new Option(data[key], key));
                     $opt.data(attr_data, key);
                     $level.append($opt);
                 } else if (data.hasOwnProperty(key)) {
-                    $opt = $(new Option(key, ""));
+                    $opt = $(new Option(key, key));
                     $opt.data(attr_data, JSON.stringify(data[key]));
                     $level.append($opt);
                 }
@@ -89,6 +90,42 @@
                 levelUp = getLevel(sid, ++levelNum, false);
             }
         };
+        findPathForKey = function () {
+            var findRec = function (object, key, path) {
+                var value = undefined;
+                var numericSearch = (typeof key === 'number');
+                var stringSearch = (typeof key === 'string');
+                if (!numericSearch && !stringSearch) {
+                    log("findPathForKey: invalid search, neither number or string, key is: " + key + ", typeof " + (typeof key));
+                    return undefined;
+                }
+                Object.keys(object).some(function (k) {
+                    if (
+                        (numericSearch && (parseInt(k) === parseInt(key))) ||
+                        (stringSearch && (String(k) === String(key)))
+                    ) {
+                        value = path.concat(k);
+                        return true;
+                    }
+                    if (object[k] && typeof object[k] === 'object') {
+                        value = findRec(object[k], key, path.concat(k));
+                        return value !== undefined;
+                    }
+                });
+                return value;
+            };
+            var foundVal = findRec(options.data, options.selectedKey, []);
+            log("findPathForKey found path: " + foundVal);
+            return foundVal;
+        };
+        openDefaultPath = function (sid) {
+            log("openDefaultPath: defaultPath " + options.defaultPath);
+            for (var levelNum = 0; levelNum < options.defaultPath.length; levelNum++) {
+                var $level = getLevel(sid, levelNum, true);
+                $level.val(options.defaultPath[levelNum]);
+                levelChangedCallback($level);
+            }
+        };
         if (options == null) {
             options = {};
         }
@@ -96,7 +133,9 @@
             data: {},
             placeholder: false,
             maxLevels: 10,
-            loggingEnabled: false
+            loggingEnabled: false,
+            selectedKey: false,
+            defaultPath: false
         }, options);
 
         return this.each(function () {
@@ -119,13 +158,23 @@
 
             fillLevelData($id, 0, options.data);
 
+            if (options.selectedKey !== false) {
+                options.defaultPath = findPathForKey();
+            }
+
+            if (options.defaultPath instanceof Array) {
+                openDefaultPath($id);
+            } else {
+                $select.trigger('change');
+            }
+
             $($select.closest('form')).submit(function () {
                 var selectedVal = $select.data(attr_selected_option);
                 $select.append(new Option("Selected", selectedVal));
                 $select.val(selectedVal);
             });
 
-            return $select.trigger('change');
+            return $select;
         });
     };
 })(jQuery);

@@ -39,6 +39,9 @@ $("#select-id").chainedSelects({
     data: dataVariable, // data, can be function which returns data structure, or plain variable, defaults to `{}`
     maxLevels: 10, // to avoid browser hangs, by default is limited to 10 levels of hierarchy, you can raise this if you need to
     loggingEnabled: false, // enables internal logging, might be useful for debugging, defaults to `false`
+    selectedKey: 3, // will pre-select options by option value, accepts numeric or string (string for selecting either category, number for the final option), default to `false`
+    // IMPORTANT: selectedKey option will override defaultPath option
+    defaultPath: ["B", "BB"], // will pre-select options by path, defaults to `false`
 });
 ```
 
@@ -46,5 +49,4 @@ $("#select-id").chainedSelects({
 ## Notes about usage
 
 - Will not allow you to select parent, only values where key is numeric (in sample selectable only 1(AA), 2(AB) and 3(BBB)
-- Currently does not allow to pre-select option, for will always appear in default state
 - Will bind to form surrounding the target select, and before form submit, place dummy option with selected value to the target select

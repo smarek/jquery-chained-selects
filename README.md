@@ -42,6 +42,7 @@ $("#select-id").chainedSelects({
     selectedKey: 3, // will pre-select options by option value, accepts numeric or string (string for selecting either category, number for the final option), default to `false`
     // IMPORTANT: selectedKey option will override defaultPath option
     defaultPath: ["B", "BB"], // will pre-select options by path, defaults to `false`
+    sortByValue: false, // sort options by text value, defaults to `false`
 });
 ```
 

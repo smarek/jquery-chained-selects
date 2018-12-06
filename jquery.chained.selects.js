@@ -65,18 +65,45 @@
             if ($.isFunction(data)) {
                 data = data();
             }
-            for (var key in data) {
-                var $opt;
-                if (!data.hasOwnProperty(key)) {
-                    log("ignoring key:" + key + ", on levelNum:" + levelNum + " chain-id:" + sid);
-                } else if (data.hasOwnProperty(key) && $.isNumeric(key)) {
-                    $opt = $(new Option(data[key], key));
-                    $opt.data(attr_data, key);
-                    $level.append($opt);
-                } else if (data.hasOwnProperty(key)) {
-                    $opt = $(new Option(key, key));
-                    $opt.data(attr_data, JSON.stringify(data[key]));
-                    $level.append($opt);
+            if (options.sortByValue) {
+                var sortedKeys = [];
+                for (var skey in data) {
+                    if (data.hasOwnProperty(skey)) {
+                        sortedKeys.push({akey: skey, avalue: data[skey]});
+                    }
+                }
+                sortedKeys.sort(function (a, b) {
+                    var acompare, bcompare;
+                    acompare = $.isNumeric(a.akey) ? a.avalue : a.akey;
+                    bcompare = $.isNumeric(b.akey) ? b.avalue : a.akey;
+                    return acompare.localeCompare(bcompare);
+                });
+                for (key in sortedKeys) {
+                    var obj = sortedKeys[key];
+                    if ($.isNumeric(obj.akey)) {
+                        $opt = $(new Option(obj.avalue, obj.akey));
+                        $opt.data(attr_data, obj.akey);
+                        $level.append($opt);
+                    } else {
+                        $opt = $(new Option(obj.akey, obj.akey));
+                        $opt.data(attr_data, JSON.stringify(obj.avalue));
+                        $level.append($opt);
+                    }
+                }
+            } else {
+                for (var key in data) {
+                    var $opt;
+                    if (!data.hasOwnProperty(key)) {
+                        log("ignoring key:" + key + ", on levelNum:" + levelNum + " chain-id:" + sid);
+                    } else if (data.hasOwnProperty(key) && $.isNumeric(key)) {
+                        $opt = $(new Option(data[key], key));
+                        $opt.data(attr_data, key);
+                        $level.append($opt);
+                    } else if (data.hasOwnProperty(key)) {
+                        $opt = $(new Option(key, key));
+                        $opt.data(attr_data, JSON.stringify(data[key]));
+                        $level.append($opt);
+                    }
                 }
             }
             $level.show();
@@ -135,7 +162,8 @@
             maxLevels: 10,
             loggingEnabled: false,
             selectedKey: false,
-            defaultPath: false
+            defaultPath: false,
+            sortByValue: false
         }, options);
 
         return this.each(function () {

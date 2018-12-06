@@ -75,7 +75,7 @@
                 sortedKeys.sort(function (a, b) {
                     var acompare, bcompare;
                     acompare = $.isNumeric(a.akey) ? a.avalue : a.akey;
-                    bcompare = $.isNumeric(b.akey) ? b.avalue : a.akey;
+                    bcompare = $.isNumeric(b.akey) ? b.avalue : b.akey;
                     return acompare.localeCompare(bcompare);
                 });
                 for (key in sortedKeys) {

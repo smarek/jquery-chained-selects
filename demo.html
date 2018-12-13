@@ -81,7 +81,8 @@
         chainedData = JSON.parse($("#json").val());
         $('#example-select').chainedSelects({
             data: chainedData,
-            loggingEnabled: true
+            loggingEnabled: true,
+            onSelectedCallback: function (id) { if(console !== undefined) { console.log("selected option", id); } },
         });
     }
 

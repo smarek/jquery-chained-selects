@@ -6,7 +6,7 @@
             attr_value_select_class = 'chained-select';
         // callable variables
         var log, getLevel, hideLevelsGreaterThan, levelChangedCallback, randomString, generateSID, fillLevelData,
-            findPathForKey, openDefaultPath;
+            findPathForKey, openDefaultPath, runUserCallback;
         // data variables
         var levels = [];
         randomString = function (length, chars) {
@@ -22,6 +22,15 @@
                 console.log("[ChainedSelects] " + data);
             }
         };
+        runUserCallback = function (data) {
+            try {
+                if (options.onSelectedCallback !== false) {
+                    options.onSelectedCallback(data);
+                }
+            } catch (e) {
+                log(e);
+            }
+        };
         levelChangedCallback = function (levelSelect) {
             var currentSelectedValue = levelSelect.find(':selected').data(attr_data);
             var currentSID = levelSelect.data(attr_chain_id);
@@ -31,10 +40,13 @@
             hideLevelsGreaterThan(currentSID, currentLevel);
             if (!currentSelectedValue) {
                 baseLevel.data(attr_selected_option, "");
+                runUserCallback("");
             } else if ($.isNumeric(currentSelectedValue)) {
                 baseLevel.data(attr_selected_option, currentSelectedValue);
+                runUserCallback(currentSelectedValue);
             } else {
                 baseLevel.data(attr_selected_option, "");
+                runUserCallback("");
                 var subData = JSON.parse(currentSelectedValue);
                 fillLevelData(currentSID, currentLevel + 1, subData);
             }
@@ -66,10 +78,13 @@
                 data = data();
             }
             if (options.sortByValue) {
+                log("sorting", data);
                 var sortedKeys = [];
                 for (var skey in data) {
                     if (data.hasOwnProperty(skey)) {
                         sortedKeys.push({akey: skey, avalue: data[skey]});
+                    } else {
+                        log("ignoring key:" + skey + ", on levelnum:" + levelNum + " chain-id:" + sid);
                     }
                 }
                 sortedKeys.sort(function (a, b) {
@@ -163,7 +178,8 @@
             loggingEnabled: false,
             selectedKey: false,
             defaultPath: false,
-            sortByValue: false
+            sortByValue: true,
+            onSelectedCallback: false
         }, options);
 
         return this.each(function () {

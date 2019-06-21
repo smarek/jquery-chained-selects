@@ -178,7 +178,7 @@
             loggingEnabled: false,
             selectedKey: false,
             defaultPath: false,
-            sortByValue: true,
+            sortByValue: false,
             onSelectedCallback: false
         }, options);
 

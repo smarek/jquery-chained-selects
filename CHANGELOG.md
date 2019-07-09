@@ -1,0 +1,24 @@
+## 1.0.0
+
+- Initial version
+
+## 1.0.1
+
+- Added option to alphabetically sort the options by text label
+
+## 1.0.2
+
+- Hotfix sorting option incorrect implementation
+
+## 1.0.3
+
+- Added user callback option on selection change
+
+## 1.0.4
+
+- Hotifx incorrect default value for sortByValue
+
+## 2.0.0
+
+- Plugin rewritten according to basic boilerplate template (https://github.com/jquery-boilerplate/jquery-boilerplate)
+- Added two exported API functions, `setLoggingEnabled(boolean loggingEnabled)` and `changeSelectedKey(string|integer newSelectedKey)`, see README for usage documentation

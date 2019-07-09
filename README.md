@@ -48,6 +48,13 @@ $("#select-id").chainedSelects({
 });
 ```
 
+## API Methods
+```javascript
+// Set logging enabled (true or false, in case of invalid argument, defaults to true)
+$("#select-id").data("chainedSelects").setLoggingEnabled(boolean);
+// Change current selected key (integer or string, for either specific choice or category)
+$("#select-id").data("chainedSelects").changeSelectedKey(newSelectedKey);
+```
 
 ## Notes about usage
 

@@ -1,144 +1,160 @@
-(function ($) {
-    return $.fn.chainedSelects = function (options) {
+;(function ($, window, document, undefined) {
+
+    "use strict";
+
+    let defaults = {
+        data: {},
+        placeholder: false,
+        maxLevels: 10,
+        loggingEnabled: false,
+        selectedKey: false,
+        defaultPath: false,
+        sortByValue: false,
+        onSelectedCallback: false
+    };
+
+    function ChainedSelect(element, options) {
+        this.element = $(element);
+        this.options = $.extend(defaults, options);
+        this.init();
+    }
+
+    $.extend(ChainedSelect.prototype, {
         // constants
-        var attr_chain_id = 'chain-id', attr_level_id = 'level-id', attr_data = 'next-level-data',
-            attr_selected_option = 'selected-option',
-            attr_value_select_class = 'chained-select';
-        // callable variables
-        var log, getLevel, hideLevelsGreaterThan, levelChangedCallback, randomString, generateSID, fillLevelData,
-            findPathForKey, openDefaultPath, runUserCallback;
-        // data variables
-        var levels = [];
-        randomString = function (length, chars) {
-            var result = '';
-            for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+        attr_chain_id: 'chain-id', attr_level_id: 'level-id', attr_data: 'next-level-data',
+        attr_selected_option: 'selected-option',
+        attr_value_select_class: 'chained-select',
+        levels: [],
+        chain_id: undefined,
+        // functions
+        randomString(length, chars) {
+            let result = '';
+            for (let i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
             return result;
-        };
-        generateSID = function () {
-            return randomString(8, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-        };
-        log = function (data) {
-            if (options.loggingEnabled && console !== undefined) {
+        },
+        generateSID() {
+            return this.randomString(8, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        },
+        log(data) {
+            if (this.options.loggingEnabled && console !== undefined) {
                 console.log("[ChainedSelects] " + data);
             }
-        };
-        runUserCallback = function (data) {
+        },
+        levelChangedCallback(levelSelect) {
+            let currentSelectedValue = levelSelect.find(':selected').data(this.attr_data);
+            let currentSID = levelSelect.data(this.attr_chain_id);
+            let currentLevel = levelSelect.data(this.attr_level_id);
+            this.log("levelChangedCallback sid:" + currentSID + ", level-id:" + currentLevel + ", currentVal: " + currentSelectedValue);
+            let baseLevel = this.getLevel(currentSID, 0);
+            this.hideLevelsGreaterThan(currentSID, currentLevel);
+            if (!currentSelectedValue) {
+                baseLevel.data(this.attr_selected_option, "");
+                this.runUserCallback("");
+            } else if ($.isNumeric(currentSelectedValue)) {
+                baseLevel.data(this.attr_selected_option, currentSelectedValue);
+                this.runUserCallback(currentSelectedValue);
+            } else {
+                baseLevel.data(this.attr_selected_option, "");
+                this.runUserCallback("");
+                let subData = JSON.parse(currentSelectedValue);
+                this.fillLevelData(currentSID, currentLevel + 1, subData);
+            }
+        },
+        runUserCallback(data) {
             try {
-                if (options.onSelectedCallback !== false) {
-                    options.onSelectedCallback(data);
+                if (this.options.onSelectedCallback !== false) {
+                    this.options.onSelectedCallback(data);
                 }
             } catch (e) {
-                log(e);
+                this.log(e);
             }
-        };
-        levelChangedCallback = function (levelSelect) {
-            var currentSelectedValue = levelSelect.find(':selected').data(attr_data);
-            var currentSID = levelSelect.data(attr_chain_id);
-            var currentLevel = levelSelect.data(attr_level_id);
-            log("levelChangedCallback sid:" + currentSID + ", level-id:" + currentLevel + ", currentVal: " + currentSelectedValue);
-            var baseLevel = getLevel(currentSID, 0);
-            hideLevelsGreaterThan(currentSID, currentLevel);
-            if (!currentSelectedValue) {
-                baseLevel.data(attr_selected_option, "");
-                runUserCallback("");
-            } else if ($.isNumeric(currentSelectedValue)) {
-                baseLevel.data(attr_selected_option, currentSelectedValue);
-                runUserCallback(currentSelectedValue);
-            } else {
-                baseLevel.data(attr_selected_option, "");
-                runUserCallback("");
-                var subData = JSON.parse(currentSelectedValue);
-                fillLevelData(currentSID, currentLevel + 1, subData);
-            }
-        };
-        getLevel = function (sid, levelNum, createIfNotExists) {
-            if (levelNum > options.maxLevels) throw new Error("level " + levelNum + " exceedes options.maxLevels, set to higher if this is required");
-            log("getLevel sid: " + sid + ", levelNum:" + levelNum);
+        },
+        getLevel(sid, levelNum, createIfNotExists) {
+            if (levelNum > this.options.maxLevels) throw new Error("level " + levelNum + " exceedes options.maxLevels, set to higher if this is required");
+            this.log("getLevel sid: " + sid + ", levelNum:" + levelNum);
             createIfNotExists = (createIfNotExists === undefined) ? true : createIfNotExists;
-            if (levels[sid] === undefined) return undefined;
-            if (createIfNotExists && levels[sid][levelNum] === undefined) {
-                var $newSelect = $("<select></select>").insertAfter(levels[sid][levelNum - 1]);
-                $newSelect.data(attr_level_id, levelNum);
-                $newSelect.data(attr_chain_id, sid);
-                $newSelect.addClass(attr_value_select_class);
+            if (this.levels[sid] === undefined) return undefined;
+            if (createIfNotExists && this.levels[sid][levelNum] === undefined) {
+                let $newSelect = $("<select></select>").insertAfter(this.levels[sid][levelNum - 1]);
+                $newSelect.data(this.attr_level_id, levelNum);
+                $newSelect.data(this.attr_chain_id, sid);
+                $newSelect.addClass(this.attr_value_select_class);
                 $newSelect.unbind('change');
-                $newSelect.change(function () {
-                    levelChangedCallback($(this));
-                });
-                levels[sid][levelNum] = $newSelect;
+                $newSelect.change(() => this.levelChangedCallback($newSelect));
+                this.levels[sid][levelNum] = $newSelect;
             }
-            return levels[sid][levelNum];
-        };
-        fillLevelData = function (sid, levelNum, data) {
-            hideLevelsGreaterThan(sid, levelNum);
-            var $level = getLevel(sid, levelNum);
+            return this.levels[sid][levelNum];
+        },
+        fillLevelData(sid, levelNum, data) {
+            this.hideLevelsGreaterThan(sid, levelNum);
+            let $level = this.getLevel(sid, levelNum);
             $level.empty();
-            $level.append(new Option(options.placeholder ? options.placeholder : "", ""));
+            $level.append(new Option(this.options.placeholder ? this.options.placeholder : "", ""));
             if ($.isFunction(data)) {
                 data = data();
             }
-            if (options.sortByValue) {
-                log("sorting", data);
-                var sortedKeys = [];
-                for (var skey in data) {
+            if (this.options.sortByValue) {
+                this.log("sorting", data);
+                let sortedKeys = [];
+                for (let skey in data) {
                     if (data.hasOwnProperty(skey)) {
                         sortedKeys.push({akey: skey, avalue: data[skey]});
                     } else {
-                        log("ignoring key:" + skey + ", on levelnum:" + levelNum + " chain-id:" + sid);
+                        this.log("ignoring key:" + skey + ", on levelnum:" + levelNum + " chain-id:" + sid);
                     }
                 }
                 sortedKeys.sort(function (a, b) {
-                    var acompare, bcompare;
+                    let acompare, bcompare;
                     acompare = $.isNumeric(a.akey) ? a.avalue : a.akey;
                     bcompare = $.isNumeric(b.akey) ? b.avalue : b.akey;
                     return acompare.localeCompare(bcompare);
                 });
-                for (key in sortedKeys) {
-                    var obj = sortedKeys[key];
+                for (let key in sortedKeys) {
+                    let obj = sortedKeys[key];
                     if ($.isNumeric(obj.akey)) {
-                        $opt = $(new Option(obj.avalue, obj.akey));
-                        $opt.data(attr_data, obj.akey);
+                        let $opt = $(new Option(obj.avalue, obj.akey));
+                        $opt.data(this.attr_data, obj.akey);
                         $level.append($opt);
                     } else {
-                        $opt = $(new Option(obj.akey, obj.akey));
-                        $opt.data(attr_data, JSON.stringify(obj.avalue));
+                        let $opt = $(new Option(obj.akey, obj.akey));
+                        $opt.data(this.attr_data, JSON.stringify(obj.avalue));
                         $level.append($opt);
                     }
                 }
             } else {
-                for (var key in data) {
-                    var $opt;
+                for (let key in data) {
+                    let $opt;
                     if (!data.hasOwnProperty(key)) {
-                        log("ignoring key:" + key + ", on levelNum:" + levelNum + " chain-id:" + sid);
+                        this.log("ignoring key:" + key + ", on levelNum:" + levelNum + " chain-id:" + sid);
                     } else if (data.hasOwnProperty(key) && $.isNumeric(key)) {
                         $opt = $(new Option(data[key], key));
-                        $opt.data(attr_data, key);
+                        $opt.data(this.attr_data, key);
                         $level.append($opt);
                     } else if (data.hasOwnProperty(key)) {
                         $opt = $(new Option(key, key));
-                        $opt.data(attr_data, JSON.stringify(data[key]));
+                        $opt.data(this.attr_data, JSON.stringify(data[key]));
                         $level.append($opt);
                     }
                 }
             }
             $level.show();
-        };
-        hideLevelsGreaterThan = function (sid, levelNum) {
-            log("hideLevelsGreaterThan sid:" + sid + ", levelNum:" + levelNum);
-            var levelUp = getLevel(sid, ++levelNum, false);
+        },
+        hideLevelsGreaterThan(sid, levelNum) {
+            this.log("hideLevelsGreaterThan sid:" + sid + ", levelNum:" + levelNum);
+            let levelUp = this.getLevel(sid, ++levelNum, false);
             while (levelUp !== undefined) {
                 levelUp.empty();
                 levelUp.hide();
-                levelUp = getLevel(sid, ++levelNum, false);
+                levelUp = this.getLevel(sid, ++levelNum, false);
             }
-        };
-        findPathForKey = function () {
-            var findRec = function (object, key, path) {
-                var value = undefined;
-                var numericSearch = (typeof key === 'number');
-                var stringSearch = (typeof key === 'string');
-                if (!numericSearch && !stringSearch) {
-                    log("findPathForKey: invalid search, neither number or string, key is: " + key + ", typeof " + (typeof key));
+        },
+        findPathForKey() {
+            let findRec = function (object, key, path, logFunction) {
+                let value = undefined;
+                let numericSearch = (typeof key === 'number');
+                let stringSearch = (typeof key === 'string');
+                if (!numericSearch && !stringSearch && logFunction) {
+                    logFunction("findPathForKey: invalid search, neither number or string, key is: " + key + ", typeof " + (typeof key));
                     return undefined;
                 }
                 Object.keys(object).some(function (k) {
@@ -150,75 +166,81 @@
                         return true;
                     }
                     if (object[k] && typeof object[k] === 'object') {
-                        value = findRec(object[k], key, path.concat(k));
+                        value = findRec(object[k], key, path.concat(k), logFunction);
                         return value !== undefined;
                     }
                 });
                 return value;
             };
-            var foundVal = findRec(options.data, options.selectedKey, []);
-            log("findPathForKey found path: " + foundVal);
+            let foundVal = findRec(this.options.data, this.options.selectedKey, [], this.log);
+            this.log("findPathForKey found path: " + foundVal);
             return foundVal;
-        };
-        openDefaultPath = function (sid) {
-            log("openDefaultPath: defaultPath " + options.defaultPath);
-            for (var levelNum = 0; levelNum < options.defaultPath.length; levelNum++) {
-                var $level = getLevel(sid, levelNum, true);
-                $level.val(options.defaultPath[levelNum]);
-                levelChangedCallback($level);
+        },
+        openDefaultPath(sid) {
+            this.log("openDefaultPath: defaultPath " + this.options.defaultPath);
+            if (this.options.defaultPath instanceof Array) {
+                for (let levelNum = 0; levelNum < this.options.defaultPath.length; levelNum++) {
+                    let $level = this.getLevel(sid, levelNum, true);
+                    $level.val(this.options.defaultPath[levelNum]);
+                    this.levelChangedCallback($level);
+                }
             }
-        };
-        if (options == null) {
-            options = {};
-        }
-        options = $.extend({
-            data: {},
-            placeholder: false,
-            maxLevels: 10,
-            loggingEnabled: false,
-            selectedKey: false,
-            defaultPath: false,
-            sortByValue: false,
-            onSelectedCallback: false
-        }, options);
+        },
+        init() {
+            let $select = this.element;
 
-        return this.each(function () {
-            var $select;
-            $select = $(this);
-
-            var $id = $select.attr('id');
+            let $id = $select.attr('id');
             if ($id === undefined) {
-                $id = generateSID();
+                $id = this.generateSID();
             }
-            $select.data(attr_level_id, 0);
-            $select.data(attr_chain_id, $id);
-            $select.addClass(attr_value_select_class);
+            this.chain_id = $id;
+
+            $select.data(this.attr_level_id, 0);
+            $select.data(this.attr_chain_id, $id);
+            $select.addClass(this.attr_value_select_class);
             $select.unbind('change');
-            $select.change(function () {
-                levelChangedCallback($(this));
-            });
-            levels[$id] = [];
-            levels[$id][0] = $select;
+            $select.change(() => this.levelChangedCallback($select));
+            this.levels[$id] = [];
+            this.levels[$id][0] = $select;
 
-            fillLevelData($id, 0, options.data);
+            this.fillLevelData($id, 0, this.options.data);
 
-            if (options.selectedKey !== false) {
-                options.defaultPath = findPathForKey();
+            if (this.options.selectedKey !== false) {
+                this.options.defaultPath = this.findPathForKey();
             }
 
-            if (options.defaultPath instanceof Array) {
-                openDefaultPath($id);
+            if (this.options.defaultPath instanceof Array) {
+                this.openDefaultPath($id);
             } else {
                 $select.trigger('change');
             }
 
-            $($select.closest('form')).submit(function () {
-                var selectedVal = $select.data(attr_selected_option);
+            $select.closest('form').submit(() => {
+                let selectedVal = $select.data(this.attr_selected_option);
                 $select.append(new Option("Selected", selectedVal));
                 $select.val(selectedVal);
             });
 
-            return $select;
+        },
+        // api
+        setLoggingEnabled(enabled) {
+            let argsCorrect = (typeof enabled === "boolean");
+            enabled = argsCorrect ? enabled : true;
+            this.options.loggingEnabled = enabled;
+            return argsCorrect;
+        },
+        changeSelectedKey(newKey) {
+            this.options.selectedKey = newKey;
+            this.options.defaultPath = this.findPathForKey();
+            this.openDefaultPath(this.chain_id);
+        }
+    });
+
+    $.fn.chainedSelects = function (options) {
+        return this.each(function () {
+            if (!$.data(this, "chainedSelects")) {
+                $.data(this, "chainedSelects", new ChainedSelect(this, options));
+            }
         });
-    };
-})(jQuery);
+    }
+})(jQuery, window, document);

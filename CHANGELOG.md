@@ -22,3 +22,7 @@
 
 - Plugin rewritten according to basic boilerplate template (https://github.com/jquery-boilerplate/jquery-boilerplate)
 - Added two exported API functions, `setLoggingEnabled(boolean loggingEnabled)` and `changeSelectedKey(string|integer newSelectedKey)`, see README for usage documentation
+
+## 2.0.1
+
+- On empty placeholder, do not create placeholder item

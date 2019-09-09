@@ -89,7 +89,9 @@
             this.hideLevelsGreaterThan(sid, levelNum);
             let $level = this.getLevel(sid, levelNum);
             $level.empty();
-            $level.append(new Option(this.options.placeholder ? this.options.placeholder : "", ""));
+            if(this.options.placeholder) {
+                $level.append(new Option(this.options.placeholder ? this.options.placeholder : "", ""));
+            }
             if ($.isFunction(data)) {
                 data = data();
             }

@@ -35,7 +35,7 @@ $(document).ready(function () {
 ## Full options
 ```javascript
 $("#select-id").chainedSelects({
-    placeholder: "", // placeholder text, can be left empty, default value is ""
+    placeholder: "", // placeholder text, can be left empty, default value is "", if the placeholder is empty, no empty option will be created
     data: dataVariable, // data, can be function which returns data structure, or plain variable, defaults to `{}`
     maxLevels: 10, // to avoid browser hangs, by default is limited to 10 levels of hierarchy, you can raise this if you need to
     loggingEnabled: false, // enables internal logging, might be useful for debugging, defaults to `false`

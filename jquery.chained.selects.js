@@ -10,7 +10,8 @@
         selectedKey: false,
         defaultPath: false,
         sortByValue: false,
-        onSelectedCallback: false
+        onSelectedCallback: false,
+        selectCssClass: false
     };
 
     function ChainedSelect(element, options) {
@@ -79,6 +80,7 @@
                 $newSelect.data(this.attr_level_id, levelNum);
                 $newSelect.data(this.attr_chain_id, sid);
                 $newSelect.addClass(this.attr_value_select_class);
+                $newSelect.addClass(this.options.selectCssClass);
                 $newSelect.unbind('change');
                 $newSelect.change(() => this.levelChangedCallback($newSelect));
                 this.levels[sid][levelNum] = $newSelect;
@@ -200,6 +202,7 @@
             $select.data(this.attr_level_id, 0);
             $select.data(this.attr_chain_id, $id);
             $select.addClass(this.attr_value_select_class);
+            $select.addClass(this.options.selectCssClass);
             $select.unbind('change');
             $select.change(() => this.levelChangedCallback($select));
             this.levels[$id] = [];

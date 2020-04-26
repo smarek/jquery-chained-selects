@@ -26,3 +26,7 @@
 ## 2.0.1
 
 - On empty placeholder, do not create placeholder item
+
+## 2.0.2
+
+- Added possibility to append extra CSS classes to used/generated select elements through option 'selectCssClass'

@@ -34,6 +34,7 @@
     <h2>Form Example</h2>
     <form method="post" action="https://httpbin.org/post">
         <button type="submit">Submit</button>
+		<strong id="selected">current</strong>
     </form>
     <h2>Test your JSON Data</h2>
     <textarea id="json">{
@@ -70,8 +71,8 @@
     <button id="load_json">Load JSON</button>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="https://smarek.github.io/jquery-chained-selects/jquery.chained.selects.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="jquery.chained.selects.js"></script>
 <script type="text/javascript">
     var chainedData = {};
 
@@ -82,7 +83,12 @@
         $('#example-select').chainedSelects({
             data: chainedData,
             loggingEnabled: true,
-            onSelectedCallback: function (id) { if(console !== undefined) { console.log("selected option", id); } },
+            onSelectedCallback: function (id) {
+                if (console !== undefined) {
+                    console.log("selected option", id);
+                }
+                $("#selected").text("selected option: " + id);
+            },
         });
     }
 

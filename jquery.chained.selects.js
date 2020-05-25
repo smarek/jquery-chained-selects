@@ -141,6 +141,7 @@
                     }
                 }
             }
+            $level.trigger('change');
             $level.show();
         },
         hideLevelsGreaterThan(sid, levelNum) {

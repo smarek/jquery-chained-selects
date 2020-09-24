@@ -1,6 +1,6 @@
 {
   "name": "jquery-chained-selects",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "description": "jQuery plugin to create chained selects from JSON data",
   "main": "jquery.chained.selects.js",
   "scripts": {

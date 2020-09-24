@@ -11,7 +11,8 @@
         defaultPath: false,
         sortByValue: false,
         onSelectedCallback: false,
-        selectCssClass: false
+        selectCssClass: false,
+        autoSelectSingleOptions: false
     };
 
     function ChainedSelect(element, options) {
@@ -91,7 +92,7 @@
             this.hideLevelsGreaterThan(sid, levelNum);
             let $level = this.getLevel(sid, levelNum);
             $level.empty();
-            if(this.options.placeholder) {
+            if (this.options.placeholder) {
                 $level.append(new Option(this.options.placeholder ? this.options.placeholder : "", ""));
             }
             if ($.isFunction(data)) {
@@ -139,6 +140,12 @@
                         $opt.data(this.attr_data, JSON.stringify(data[key]));
                         $level.append($opt);
                     }
+                }
+            }
+            if (this.options.autoSelectSingleOptions === true) {
+                let childrenCount = $level.children().length;
+                if ((this.options.placeholder && childrenCount === 2) || (childrenCount === 1)) {
+                    $level.children().last().attr('selected', 'selected');
                 }
             }
             $level.trigger('change');

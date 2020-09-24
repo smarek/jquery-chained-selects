@@ -30,3 +30,7 @@
 ## 2.0.2
 
 - Added possibility to append extra CSS classes to used/generated select elements through option 'selectCssClass'
+
+## 2.1.0
+
+  Added option `autoSelectSingleOptions` to allow automatic pre-selection of option if there is only single one (works recursively)

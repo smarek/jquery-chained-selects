@@ -46,6 +46,7 @@ $("#select-id").chainedSelects({
     sortByValue: false, // sort options by text value, defaults to `false`
     // IMPORTANT: if provided callback function fails, it will not report caught error if the `loggingEnabled` is not `true`
     onSelectedCallback: function(id){}, // will call user defined function with id of currently selected, or empty string if non-final option was chosen, defaults to `false`
+    autoSelectSingleOptions: true, // will automatically select single options at any level (recursively), forcing user to make a choice only when there is choice to make, defaults to `false`
 });
 ```
 

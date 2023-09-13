@@ -17,7 +17,7 @@
 
     function ChainedSelect(element, options) {
         this.element = $(element);
-        this.options = $.extend(defaults, options);
+        this.options = $.extend({}, defaults, options);
         this.init();
     }
 

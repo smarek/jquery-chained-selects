@@ -34,3 +34,7 @@
 ## 2.1.0
 
   Added option `autoSelectSingleOptions` to allow automatic pre-selection of option if there is only single one (works recursively)
+
+## 2.1.1
+
+  Multiple instances on the same page should now work without cross-contamination
